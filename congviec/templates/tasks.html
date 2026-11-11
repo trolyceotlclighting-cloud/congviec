@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% from "_macros.html" import task_table with context %}
+{% block content %}
+<div class="row-between">
+  <h1>Công việc ({{ tasks|length }})</h1>
+  <div>
+    <a class="btn" href="{{ url_for('task_new') }}">+ Thêm việc</a>
+    <a class="btn ghost" href="{{ url_for('tasks_csv', **args) }}">Xuất Excel (CSV)</a>
+  </div>
+</div>
+<form class="filters" method="get">
+  <input name="q" placeholder="Tìm kiếm…" value="{{ args.get('q', '') }}">
+  <select name="department"><option value="">Mọi phòng ban</option>
+    {% for d in DEPARTMENTS %}<option {% if args.get('department') == d %}selected{% endif %}>{{ d }}</option>{% endfor %}
+  </select>
+  <select name="status"><option value="">Mọi trạng thái</option>
+    {% for s in STATUSES %}<option {% if args.get('status') == s %}selected{% endif %}>{{ s }}</option>{% endfor %}
+  </select>
+  <select name="priority"><option value="">Mọi mức ưu tiên</option>
+    {% for p in PRIORITIES %}<option {% if args.get('priority') == p %}selected{% endif %}>{{ p }}</option>{% endfor %}
+  </select>
+  <label class="check"><input type="checkbox" name="open" value="1" {% if args.get('open') %}checked{% endif %}> Chỉ việc đang mở</label>
+  <button class="btn small">Lọc</button>
+</form>
+<div class="card">{{ task_table(tasks) }}</div>
+{% endblock %}

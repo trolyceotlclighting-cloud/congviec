@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>{% if is_new %}Thêm công việc{% else %}Công việc #{{ task.id }}{% endif %}</h1>
+<div class="grid">
+  <form method="post" class="card form" action="{% if is_new %}{{ url_for('task_new') }}{% endif %}">
+    <input type="hidden" name="message_id" value="{{ task.message_id or '' }}">
+    <label>Tên công việc<input name="title" value="{{ task.title }}" required></label>
+    <label>Mô tả<textarea name="description" rows="6">{{ task.description or '' }}</textarea></label>
+    <div class="cols">
+      <label>Phòng ban<select name="department">
+        {% for d in DEPARTMENTS %}<option {% if d == task.department %}selected{% endif %}>{{ d }}</option>{% endfor %}
+      </select></label>
+      <label>Trạng thái<select name="status">
+        {% for s in STATUSES %}<option {% if s == task.status %}selected{% endif %}>{{ s }}</option>{% endfor %}
+      </select></label>
+      <label>Ưu tiên<select name="priority">
+        {% for p in PRIORITIES %}<option {% if p == task.priority %}selected{% endif %}>{{ p }}</option>{% endfor %}
+      </select></label>
+    </div>
+    <div class="cols">
+      <label>Người phụ trách<input name="assignee" value="{{ task.assignee or '' }}"></label>
+      <label>Hạn chót<input type="date" name="deadline" value="{{ task.deadline or '' }}"></label>
+    </div>
+    <label>Ghi chú / Chỉ đạo<textarea name="note" rows="3">{{ task.note or '' }}</textarea></label>
+    <div class="row-between">
+      <button class="btn">Lưu</button>
+      {% if not is_new %}
+        <button class="btn danger" name="action" value="delete" onclick="return confirm('Xoá công việc này?')">Xoá</button>
+      {% endif %}
+    </div>
+    {% if not is_new %}<p class="muted">Tạo: {{ task.created_at }} · Cập nhật: {{ task.updated_at }}</p>{% endif %}
+  </form>
+  {% if msg %}
+  <section class="card">
+    <h2>Nguồn: <span class="pill src-{{ msg.source }}">{{ msg.source }}</span> {{ msg.channel }}</h2>
+    <p><b>{{ msg.sender }}</b> · <span class="muted">{{ msg.received_at }}</span></p>
+    {% if msg.subject %}<p><b>{{ msg.subject }}</b></p>{% endif %}
+    <pre class="body">{{ msg.body }}</pre>
+    <a href="{{ url_for('message_detail', msg_id=msg.id) }}">Xem tin gốc →</a>
+  </section>
+  {% endif %}
+</div>
+{% endblock %}

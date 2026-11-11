@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% from "_macros.html" import task_table with context %}
+{% block content %}
+<h1>Tổng quan công việc</h1>
+<div class="stats">
+  {% for s in STATUSES %}
+    <a class="stat" href="{{ url_for('tasks', status=s) }}"><span>{{ by_status.get(s, 0) }}</span>{{ s }}</a>
+  {% endfor %}
+  <a class="stat" href="{{ url_for('messages', source='email') }}"><span>{{ msg_count.get('email', 0) }}</span>Email</a>
+  <a class="stat" href="{{ url_for('messages', source='zalo') }}"><span>{{ msg_count.get('zalo', 0) }}</span>Tin Zalo</a>
+</div>
+<p class="muted">Gmail đồng bộ lần cuối: {{ last_sync }}</p>
+
+<div class="grid">
+  <section class="card">
+    <h2>Cần anh chốt / Khẩn</h2>
+    {{ task_table(waiting) }}
+  </section>
+  <section class="card">
+    <h2>Việc đang mở theo phòng ban</h2>
+    <table class="list">
+      <thead><tr><th>Phòng ban</th><th>Đang mở</th><th>Quá hạn</th></tr></thead>
+      <tbody>
+      {% for d in by_dept %}
+        <tr><td><a href="{{ url_for('tasks', department=d.department, open=1) }}">{{ d.department }}</a></td>
+            <td>{{ d.n }}</td><td class="{% if d.overdue %}red{% endif %}">{{ d.overdue }}</td></tr>
+      {% else %}<tr><td colspan="3" class="muted">Chưa có dữ liệu.</td></tr>{% endfor %}
+      </tbody>
+    </table>
+  </section>
+</div>
+
+<section class="card">
+  <h2>Quá hạn</h2>
+  {{ task_table(overdue) }}
+</section>
+
+<section class="card">
+  <h2>Tin nhắn mới nhất</h2>
+  <table class="list">
+    {% for m in recent %}
+      <tr><td><span class="pill src-{{ m.source }}">{{ m.source }}</span></td>
+          <td>{{ m.channel }}</td><td>{{ m.sender }}</td>
+          <td><a href="{{ url_for('message_detail', msg_id=m.id) }}">{{ m.subject or (m.body[:90] if m.body else '') }}</a></td>
+          <td class="muted nowrap">{{ m.received_at }}</td></tr>
+    {% else %}<tr><td class="muted">Chưa có tin nhắn. Bấm “Đồng bộ Gmail” hoặc “Nhập Zalo”.</td></tr>{% endfor %}
+  </table>
+</section>
+{% endblock %}

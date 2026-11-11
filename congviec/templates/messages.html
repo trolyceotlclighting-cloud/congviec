@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Kho tin nhắn</h1>
+<form class="filters" method="get">
+  <input name="q" placeholder="Tìm trong toàn bộ email & Zalo…" value="{{ args.get('q', '') }}">
+  <select name="source"><option value="">Mọi nguồn</option>
+    {% for s in ['email', 'zalo', 'manual'] %}<option {% if args.get('source') == s %}selected{% endif %}>{{ s }}</option>{% endfor %}
+  </select>
+  <select name="channel"><option value="">Mọi hộp thư / nhóm</option>
+    {% for c in channels %}<option {% if args.get('channel') == c %}selected{% endif %}>{{ c }}</option>{% endfor %}
+  </select>
+  <select name="department"><option value="">Mọi phòng ban</option>
+    {% for d in DEPARTMENTS %}<option {% if args.get('department') == d %}selected{% endif %}>{{ d }}</option>{% endfor %}
+  </select>
+  <button class="btn small">Lọc</button>
+</form>
+<div class="card">
+<table class="list">
+  <thead><tr><th>Nguồn</th><th>Nhóm / Hộp thư</th><th>Người gửi</th><th>Nội dung</th><th>Phòng ban</th><th>Thời gian</th></tr></thead>
+  {% for m in messages %}
+    <tr><td><span class="pill src-{{ m.source }}">{{ m.source }}</span></td>
+        <td>{{ m.channel }}</td><td>{{ m.sender }}</td>
+        <td><a href="{{ url_for('message_detail', msg_id=m.id) }}">{{ m.subject or (m.body[:110] if m.body else '') }}</a></td>
+        <td>{{ m.department }}</td>
+        <td class="muted nowrap">{{ m.received_at }}</td></tr>
+  {% else %}<tr><td colspan="6" class="muted">Không có tin nhắn.</td></tr>{% endfor %}
+</table>
+</div>
+<div class="row-between">
+  {% if page > 1 %}<a href="{{ url_for('messages', **dict(args, page=page-1)) }}">← Trang trước</a>{% else %}<span></span>{% endif %}
+  {% if messages|length == 100 %}<a href="{{ url_for('messages', **dict(args, page=page+1)) }}">Trang sau →</a>{% endif %}
+</div>
+{% endblock %}

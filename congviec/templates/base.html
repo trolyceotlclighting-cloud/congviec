@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}Kho Công Việc TLC{% endblock %}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+{% if session.get('ok') or not config.APP_PASSWORD %}
+<header class="top">
+  <a class="brand" href="{{ url_for('dashboard') }}">Kho Công Việc <b>TLC</b></a>
+  <nav>
+    <a href="{{ url_for('dashboard') }}">Tổng quan</a>
+    <a href="{{ url_for('tasks', open=1) }}">Công việc</a>
+    <a href="{{ url_for('messages') }}">Kho tin nhắn</a>
+    <a href="{{ url_for('import_zalo') }}">Nhập Zalo</a>
+    <form method="post" action="{{ url_for('sync_gmail') }}" class="inline">
+      <button class="btn small">↻ Đồng bộ Gmail</button>
+    </form>
+    {% if config.APP_PASSWORD %}<a href="{{ url_for('logout') }}" class="muted">Thoát</a>{% endif %}
+  </nav>
+</header>
+{% endif %}
+<main>
+  {% for cat, msg in get_flashed_messages(with_categories=true) %}
+    <div class="flash {{ cat }}">{{ msg }}</div>
+  {% endfor %}
+  {% block content %}{% endblock %}
+</main>
+</body>
+</html>

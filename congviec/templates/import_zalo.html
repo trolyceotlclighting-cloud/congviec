@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Nhập tin nhắn nhóm Zalo</h1>
+<div class="grid">
+  <form method="post" enctype="multipart/form-data" class="card form">
+    <label>Tên nhóm Zalo
+      <input name="group" list="groups" placeholder="VD: TLC - Ban Giám đốc" required>
+      <datalist id="groups">{% for g in groups %}<option>{{ g }}</option>{% endfor %}</datalist>
+    </label>
+    <label>Dán đoạn hội thoại
+      <textarea name="content" rows="14" placeholder="[11/11/2026 09:15] Nguyễn Văn A: Đề nghị anh duyệt báo giá dự án X, hạn 15/11
+[09:20] Trần Thị B: Em gửi báo cáo doanh số tuần"></textarea>
+    </label>
+    <label>…hoặc tải file (.txt, .json, .csv)<input type="file" name="file" accept=".txt,.json,.csv"></label>
+    <label class="check"><input type="checkbox" name="auto_task" value="1" checked> Tự động tạo công việc từ tin có yêu cầu / đề nghị / hạn chót</label>
+    <button class="btn">Nhập vào kho</button>
+  </form>
+  <section class="card">
+    <h2>Hướng dẫn</h2>
+    <ol>
+      <li>Trên Zalo PC/Web, mở nhóm → chọn nhiều tin nhắn → Sao chép, rồi dán vào ô bên trái.</li>
+      <li>Ứng dụng nhận các định dạng dòng:
+        <code>[dd/mm/yyyy hh:mm] Tên: nội dung</code>, <code>[hh:mm] Tên: nội dung</code>,
+        <code>Tên (hh:mm): nội dung</code>, <code>hh:mm Tên: nội dung</code>.
+        Nếu không khớp, mỗi đoạn (cách nhau dòng trống) được lưu là một tin.</li>
+      <li>Nhập lại cùng nội dung sẽ không bị trùng.</li>
+      <li>Tự động hoá: gửi tin về <code>POST /api/ingest?token=…</code> với JSON
+        <code>{"group":"Tên nhóm","sender":"…","text":"…","time":"dd/mm/yyyy hh:mm"}</code>
+        (dùng cho Zalo Official Account, n8n, Make…).</li>
+    </ol>
+  </section>
+</div>
+{% endblock %}

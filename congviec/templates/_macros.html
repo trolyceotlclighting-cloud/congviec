@@ -1,0 +1,25 @@
+{% macro task_table(rows) %}
+<table class="list">
+  <thead><tr><th>Công việc</th><th>Phòng ban</th><th>Ưu tiên</th><th>Phụ trách</th><th>Hạn</th><th>Trạng thái</th></tr></thead>
+  <tbody>
+  {% for t in rows %}
+    <tr class="{% if t.deadline and t.deadline < today and t.status not in ['Hoàn thành','Huỷ'] %}overdue{% endif %}">
+      <td><a href="{{ url_for('task_detail', task_id=t.id) }}">{{ t.title }}</a></td>
+      <td>{{ t.department }}</td>
+      <td><span class="pill p-{{ t.priority|replace(' ', '') }}">{{ t.priority }}</span></td>
+      <td>{{ t.assignee or '—' }}</td>
+      <td>{{ t.deadline or '—' }}</td>
+      <td>
+        <form method="post" action="{{ url_for('task_status', task_id=t.id) }}" class="inline">
+          <select name="status" onchange="this.form.submit()">
+            {% for s in STATUSES %}<option {% if s == t.status %}selected{% endif %}>{{ s }}</option>{% endfor %}
+          </select>
+        </form>
+      </td>
+    </tr>
+  {% else %}
+    <tr><td colspan="6" class="muted">Không có công việc.</td></tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% endmacro %}
